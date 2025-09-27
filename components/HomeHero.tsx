@@ -66,12 +66,14 @@ const HomeHero: React.FC<HomeHeroProps> = ({ movies, children }) => {
         <div className="flex items-center gap-4">
           <Link
             href={`/phim/${currentMovie.slug}`}
+            suppressHydrationWarning
             className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded font-semibold inline-flex items-center gap-2 shadow transition hover:scale-105"
           >
             ▶ Play
           </Link>
           <Link
             href={`/phim/${currentMovie.slug}`}
+            suppressHydrationWarning
             className="border border-white/80 text-white px-5 py-3 rounded inline-flex items-center gap-2 transition hover:bg-white/10"
           >
             + Xem sau

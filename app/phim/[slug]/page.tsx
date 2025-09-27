@@ -97,7 +97,7 @@ export default function MovieDetailPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Không tìm thấy phim</h1>
           <p className="text-gray-400 mb-6">Phim bạn tìm kiếm không tồn tại hoặc đã bị xóa</p>
-          <Link href="/" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition-colors">
+          <Link href="/" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition-colors" suppressHydrationWarning>
             Về trang chủ
           </Link>
         </div>
@@ -110,7 +110,7 @@ export default function MovieDetailPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-cyan-400 transition-colors">
+          <Link href="/" className="hover:text-cyan-400 transition-colors" suppressHydrationWarning>
             Trang chủ
           </Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,6 +158,7 @@ export default function MovieDetailPage() {
               <Link
                 href={`/xem/${movie.slug}/${getFirstEpisodeSlug()}`}
                 className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                suppressHydrationWarning
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/>

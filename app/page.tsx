@@ -266,6 +266,7 @@ export default async function HomePage() {
                     title={movie.name}
                     className="relative block h-full w-[72%]"
                     aria-label={`Xem phim ${movie.name}`}
+                    suppressHydrationWarning
                   >
                     <div className="rounded-[4px] relative aspect-[2/3] w-full overflow-hidden">
                       <img
@@ -300,6 +301,7 @@ export default async function HomePage() {
                       href={`/phim/${movie.slug}`}
                       className="line-clamp-2 text-xs font-semibold text-gray-300 hover:text-cyan-400 lg:text-base"
                       title={movie.name}
+                      suppressHydrationWarning
                     >
                       {movie.name}
                     </Link>
@@ -353,6 +355,7 @@ export default async function HomePage() {
           <Link
             href="/danh-muc/phim-moi"
             className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+            suppressHydrationWarning
           >
             <span>Xem thêm</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,6 +381,7 @@ export default async function HomePage() {
           <Link
             href="/danh-muc/phim-hay"
             className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+            suppressHydrationWarning
           >
             <span>Xem thêm</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,6 +413,7 @@ export default async function HomePage() {
               <Link
                 href="/danh-muc/hanh-dong"
                 className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                suppressHydrationWarning
               >
                 <span>Xem thêm</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,6 +439,7 @@ export default async function HomePage() {
               <Link
                 href="/danh-muc/tinh-cam"
                 className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                suppressHydrationWarning
               >
                 <span>Xem thêm</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,6 +466,7 @@ export default async function HomePage() {
                 <Link
                   href="/danh-muc/hai-huoc"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
                 >
                   <span>Xem thêm</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,6 +497,7 @@ export default async function HomePage() {
                 <Link
                   href="/danh-muc/tinh-co-trang"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
                 >
                   <span>Xem thêm</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -517,6 +525,7 @@ export default async function HomePage() {
                 <Link
                   href="/danh-muc/phim-le"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
                 >
                   <span>Xem thêm</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -544,6 +553,7 @@ export default async function HomePage() {
                 <Link
                   href="/danh-muc/phim-bo"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
                 >
                   <span>Xem thêm</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,6 +581,7 @@ export default async function HomePage() {
                 <Link
                   href="/danh-muc/hoat-hinh"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
                 >
                   <span>Xem thêm</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

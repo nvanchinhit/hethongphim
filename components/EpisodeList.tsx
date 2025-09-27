@@ -41,6 +41,7 @@ const EpisodeList = ({ episodes, currentEpisode, movieSlug }: EpisodeListProps) 
               return (
                 <Link
                   key={episode.slug || `ep-${chunkIndex}-${epIndex}`}
+                  suppressHydrationWarning
                   href={`/xem/${movieSlug}/${episode.slug}`}
                   className={`
                     px-3 py-2 text-sm font-medium rounded-lg text-center transition-all duration-200

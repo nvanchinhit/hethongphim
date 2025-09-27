@@ -226,7 +226,7 @@ export default function CategoryPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-cyan-400 transition-colors">
+          <Link href="/" className="hover:text-cyan-400 transition-colors" suppressHydrationWarning>
             Trang chủ
           </Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

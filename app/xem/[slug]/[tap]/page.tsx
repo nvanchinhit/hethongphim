@@ -106,7 +106,7 @@ export default function WatchPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Không tìm thấy tập phim</h1>
           <p className="text-gray-400 mb-6">Tập phim bạn tìm kiếm không tồn tại hoặc đã bị xóa</p>
-          <Link href="/" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition-colors">
+          <Link href="/" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition-colors" suppressHydrationWarning>
             Về trang chủ
           </Link>
         </div>
@@ -119,13 +119,13 @@ export default function WatchPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-cyan-400 transition-colors">
+          <Link href="/" className="hover:text-cyan-400 transition-colors" suppressHydrationWarning>
             Trang chủ
           </Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <Link href={`/phim/${movie.slug}`} className="hover:text-cyan-400 transition-colors truncate">
+          <Link href={`/phim/${movie.slug}`} className="hover:text-cyan-400 transition-colors truncate" suppressHydrationWarning>
             {movie.name}
           </Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

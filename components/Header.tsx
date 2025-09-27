@@ -96,7 +96,7 @@ const Header = () => {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3" suppressHydrationWarning>
             <Image src="https://cdn.worldvectorlogo.com/logos/c-1.svg" alt="Logo" width={40} height={40} />
             <span className="text-white font-bold tracking-wide text-lg hidden sm:block">
               PHIMCHILL
@@ -125,8 +125,8 @@ const Header = () => {
                       <Link
                         key={item.slug}
                         href={`/danh-muc/${item.slug}`}
-                        className="px-2 py-1.5 rounded text-xs text-gray-300 hover:text-cyan-400 hover:bg-white/10 transition-colors text-center truncate"
                         suppressHydrationWarning
+                        className="px-2 py-1.5 rounded text-xs text-gray-300 hover:text-cyan-400 hover:bg-white/10 transition-colors text-center truncate"
                         title={item.name}
                       >
                         {item.name}
@@ -191,11 +191,11 @@ const Header = () => {
               </form>
 
               <nav className="grid grid-cols-2 gap-3 text-white">
-                <Link href="/" className="hover:text-cyan-400">Đề Xuất</Link>
-                <Link href="/danh-muc/tv-shows" className="hover:text-cyan-400">TV Shows</Link>
-                <Link href="/danh-muc/phim-le" className="hover:text-cyan-400">Phim Lẻ</Link>
-                <Link href="/danh-muc/phim-bo" className="hover:text-cyan-400">Phim Bộ</Link>
-                <Link href="/danh-muc/phim-dang-chieu" className="hover:text-cyan-400">Đang chiếu</Link>
+                <Link href="/" className="hover:text-cyan-400" suppressHydrationWarning>Đề Xuất</Link>
+                <Link href="/danh-muc/tv-shows" className="hover:text-cyan-400" suppressHydrationWarning>TV Shows</Link>
+                <Link href="/danh-muc/phim-le" className="hover:text-cyan-400" suppressHydrationWarning>Phim Lẻ</Link>
+                <Link href="/danh-muc/phim-bo" className="hover:text-cyan-400" suppressHydrationWarning>Phim Bộ</Link>
+                <Link href="/danh-muc/phim-dang-chieu" className="hover:text-cyan-400" suppressHydrationWarning>Đang chiếu</Link>
               </nav>
 
               {menuItems.map((menu) => (
@@ -206,6 +206,7 @@ const Header = () => {
                       <Link
                         key={item.slug}
                         href={`/danh-muc/${item.slug}`}
+                        suppressHydrationWarning
                         className="text-gray-300 hover:text-cyan-400 transition-colors text-sm"
                         onClick={() => setIsMenuOpen(false)}
                       >

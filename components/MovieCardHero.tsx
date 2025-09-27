@@ -17,7 +17,7 @@ const MovieCardHero = ({ movie, showEpisode = true }: MovieCardProps) => {
 
   return (
     <div className="movie-card-hero bg-slate-800/80 backdrop-blur-sm rounded-xl overflow-hidden group relative shadow-lg hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 border border-slate-700/50 hover:border-cyan-500/30 h-full w-full hover:scale-105 hover:z-20">
-      <Link href={`/phim/${movie.slug}`} className="flex flex-col h-full">
+      <Link href={`/phim/${movie.slug}`} className="flex flex-col h-full" suppressHydrationWarning>
         <div className="relative aspect-[2/3] overflow-hidden bg-slate-700">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-slate-700 animate-pulse flex items-center justify-center">

@@ -81,6 +81,7 @@ const HeroCarousel = ({ movies }: HeroCarouselProps) => {
           </p>
           <Link
             href={`/phim/${movies[currentSlide]?.slug}`}
+            suppressHydrationWarning
             className="inline-flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -132,6 +133,7 @@ const HeroCarousel = ({ movies }: HeroCarouselProps) => {
         <Link
           href={`/phim/${movies[currentSlide]?.slug}`}
           className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg"
+          suppressHydrationWarning
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z"/>

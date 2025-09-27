@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
 import { useSearchParams } from 'next/navigation';
 import MovieGrid from '@/components/MovieGrid';
 import Pagination from '@/components/Pagination';
 import { searchMovies } from '@/lib/movieApi';
 import type { Movie, Pagination as PaginationType } from '@/types';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams?.get('q') || '';
   const currentPage = parseInt(searchParams?.get('page') || '1');
@@ -154,5 +156,34 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Kết quả tìm kiếm
+            </h1>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {Array.from({ length: 24 }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-slate-700 aspect-[2/3] rounded-lg mb-3"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-slate-700 rounded w-3/4"></div>
+                  <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }
