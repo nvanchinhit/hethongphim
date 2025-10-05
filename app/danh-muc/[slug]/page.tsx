@@ -27,10 +27,10 @@ export default function CategoryPage() {
   const [topMovies, setTopMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationType>({
-    current_page: 1,
-    total_page: 1,
-    total_items: 0,
-    items_per_page: 7
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    totalItemsPerPage: 24
   });
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'most-viewed' | 'rating'>(initialSort);
   const [yearFilter, setYearFilter] = useState<string>(initialYear);
@@ -81,7 +81,7 @@ export default function CategoryPage() {
 
         setCategoryInfo(pageInfo);
         setMovies(response.items);
-        setPagination(response.paginate);
+        setPagination(response.pagination);
         
         // Load top movies
         try {
@@ -96,10 +96,10 @@ export default function CategoryPage() {
         console.error('Error loading movies:', error);
         setMovies([]);
         setPagination({
-          current_page: 1,
-          total_page: 1,
-          total_items: 0,
-          items_per_page: 7
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 0,
+          totalItemsPerPage: 24
         });
       } finally {
         setLoading(false);
@@ -116,7 +116,7 @@ export default function CategoryPage() {
       list = list.filter((m) => (m.quality || '').toLowerCase() === qualityFilter.toLowerCase());
     }
     if (yearFilter) {
-      list = list.filter((m) => String(m.year || (m.created ? new Date(m.created).getFullYear() : '')) === yearFilter);
+      list = list.filter((m) => String(m.year || (m.created?.time ? new Date(m.created.time).getFullYear() : '')) === yearFilter);
     }
     switch (sortBy) {
       case 'newest':
@@ -242,7 +242,7 @@ export default function CategoryPage() {
           </h1>
           {!loading && (
             <p className="text-gray-400">
-              Tìm thấy {pagination.total_items} phim • Trang {pagination.current_page} / {pagination.total_page}
+              Tìm thấy {pagination.totalItems} phim • Trang {pagination.currentPage} / {pagination.totalPages}
             </p>
           )}
         </div>
@@ -301,10 +301,10 @@ export default function CategoryPage() {
             <MovieGrid movies={displayedMovies} loading={loading} />
 
             {/* Pagination */}
-            {!loading && pagination.total_page > 1 && (
+            {!loading && pagination.totalPages > 1 && (
               <Pagination
-                currentPage={pagination.current_page}
-                totalPages={pagination.total_page}
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
                 onPageChange={handlePageChange}
               />
             )}

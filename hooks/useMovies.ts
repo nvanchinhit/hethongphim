@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import type { Movie } from '@/types';
 import { 
-  getMovies, 
   getFeaturedMovies, 
   getNewUpdateMovies, 
   getTopRatedMovies,
   getMoviesByCategory,
-  getNewMoviesByType,
+  getMoviesByGenre,
+  getMoviesByCountry,
+  getMoviesByYear,
   searchMovies,
-  getMovieById
-} from '@/lib/mockData';
+  getMovieDetail
+} from '@/lib/movieApi';
 
 interface UseMoviesOptions {
   page?: number;
@@ -33,8 +34,19 @@ export function useMovies(options: UseMoviesOptions = {}) {
       try {
         setLoading(true);
         setError(null);
-        const response = await getMovies(options);
-        setMovies(response.data);
+        
+        let response;
+        if (options.category) {
+          response = await getMoviesByCategory(options.category, options.page || 1);
+        } else if (options.country) {
+          response = await getMoviesByCountry(options.country, options.page || 1);
+        } else if (options.year) {
+          response = await getMoviesByYear(options.year.toString(), options.page || 1);
+        } else {
+          response = await getNewUpdateMovies(options.page || 1);
+        }
+        
+        setMovies(response.items);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch movies');
         setMovies([]);
@@ -85,8 +97,8 @@ export function useNewUpdateMovies(limit = 24) {
       try {
         setLoading(true);
         setError(null);
-        const data = await getNewUpdateMovies(limit);
-        setMovies(data);
+        const response = await getNewUpdateMovies(1);
+        setMovies(response.items.slice(0, limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch new update movies');
         setMovies([]);
@@ -111,8 +123,8 @@ export function useTopRatedMovies(limit = 12) {
       try {
         setLoading(true);
         setError(null);
-        const data = await getTopRatedMovies(limit);
-        setMovies(data);
+        const data = await getTopRatedMovies();
+        setMovies(data.slice(0, limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch top rated movies');
         setMovies([]);
@@ -139,8 +151,8 @@ export function useMoviesByCategory(categorySlug: string, limit = 12) {
       try {
         setLoading(true);
         setError(null);
-        const data = await getMoviesByCategory(categorySlug, limit);
-        setMovies(data);
+        const response = await getMoviesByCategory(categorySlug, 1);
+        setMovies(response.items.slice(0, limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch movies by category');
         setMovies([]);
@@ -168,8 +180,8 @@ export function useNewMoviesByType(
       try {
         setLoading(true);
         setError(null);
-        const data = await getNewMoviesByType(type, limit);
-        setMovies(data);
+        const response = await getMoviesByCategory(type, 1);
+        setMovies(response.items.slice(0, limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch movies by type');
         setMovies([]);
@@ -199,8 +211,8 @@ export function useSearchMovies(query: string, limit = 12) {
       try {
         setLoading(true);
         setError(null);
-        const data = await searchMovies(query, limit);
-        setMovies(data);
+        const response = await searchMovies({ keyword: query, limit });
+        setMovies(response.items.slice(0, limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to search movies');
         setMovies([]);
@@ -228,7 +240,7 @@ export function useMovie(slug: string) {
       try {
         setLoading(true);
         setError(null);
-        const data = await getMovieById(slug);
+        const data = await getMovieDetail(slug);
         setMovie(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch movie');
@@ -242,4 +254,89 @@ export function useMovie(slug: string) {
   }, [slug]);
 
   return { movie, loading, error };
+}
+
+// New hooks for additional functionality
+export function useMoviesByGenre(genreSlug: string, limit = 12) {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!genreSlug) return;
+
+    const fetchMoviesByGenre = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getMoviesByGenre(genreSlug, 1);
+        setMovies(response.items.slice(0, limit));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch movies by genre');
+        setMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoviesByGenre();
+  }, [genreSlug, limit]);
+
+  return { movies, loading, error };
+}
+
+export function useMoviesByCountry(countrySlug: string, limit = 12) {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!countrySlug) return;
+
+    const fetchMoviesByCountry = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getMoviesByCountry(countrySlug, 1);
+        setMovies(response.items.slice(0, limit));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch movies by country');
+        setMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoviesByCountry();
+  }, [countrySlug, limit]);
+
+  return { movies, loading, error };
+}
+
+export function useMoviesByYear(year: string, limit = 12) {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!year) return;
+
+    const fetchMoviesByYear = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getMoviesByYear(year, 1);
+        setMovies(response.items.slice(0, limit));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch movies by year');
+        setMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoviesByYear();
+  }, [year, limit]);
+
+  return { movies, loading, error };
 }

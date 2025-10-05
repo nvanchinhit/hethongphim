@@ -77,7 +77,7 @@ const HeroCarousel = ({ movies }: HeroCarouselProps) => {
             )}
           </div>
           <p className="text-gray-200/90 text-sm md:text-base max-w-2xl line-clamp-2 mb-6">
-            {movies[currentSlide]?.original_name || movies[currentSlide]?.originalName}
+            {movies[currentSlide]?.origin_name || movies[currentSlide]?.originalName}
           </p>
           <Link
             href={`/phim/${movies[currentSlide]?.slug}`}

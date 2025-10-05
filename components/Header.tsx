@@ -94,73 +94,78 @@ const Header = () => {
       }`}
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3" suppressHydrationWarning>
+        <div className="flex items-center h-20">
+          {/* Logo (left) */}
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0" suppressHydrationWarning>
             <Image src="https://cdn.worldvectorlogo.com/logos/c-1.svg" alt="Logo" width={40} height={40} />
             <span className="text-white font-bold tracking-wide text-lg hidden sm:block">
               PHIMCHILL
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6 text-white font-medium">
-            <Link href="/" className="hover:text-cyan-400" suppressHydrationWarning>Đề Xuất</Link>
-            <Link href="/danh-muc/tv-shows" className="hover:text-cyan-400" suppressHydrationWarning>TV Shows</Link>
-            <Link href="/danh-muc/phim-le" className="hover:text-cyan-400" suppressHydrationWarning>Phim Lẻ</Link>
-            <Link href="/danh-muc/phim-bo" className="hover:text-cyan-400" suppressHydrationWarning>Phim Bộ</Link>
-            <Link href="/danh-muc/phim-dang-chieu" className="hover:text-cyan-400" suppressHydrationWarning>Phim đang chiếu</Link>
-
-            {menuItems.map((menu) => (
-              <div key={menu.title} className="relative group">
-                <button className="flex items-center gap-1 hover:text-cyan-400">
-                  <span>{menu.title}</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className="absolute top-full left-0 mt-2 w-96 bg-slate-900/95 backdrop-blur rounded-xl shadow-2xl border border-slate-700/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="grid grid-cols-3 gap-1 p-4 max-h-80 overflow-y-auto">
-                    {menu.items.map((item) => (
-                      <Link
-                        key={item.slug}
-                        href={`/danh-muc/${item.slug}`}
-                        suppressHydrationWarning
-                        className="px-2 py-1.5 rounded text-xs text-gray-300 hover:text-cyan-400 hover:bg-white/10 transition-colors text-center truncate"
-                        title={item.name}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+          {/* Desktop Navigation (right with search) */}
+          <div className="hidden lg:flex flex-1 items-center justify-end gap-6">
+            {/* Group 1: primary links */}
+            <nav className="flex items-center gap-5 text-white text-sm mr-6">
+              <Link href="/" className="hover:text-cyan-400" suppressHydrationWarning>Đề Xuất</Link>
+              <Link href="/danh-muc/tv-shows" className="hover:text-cyan-400" suppressHydrationWarning>TV Shows</Link>
+              <Link href="/danh-muc/phim-le" className="hover:text-cyan-400" suppressHydrationWarning>Phim Lẻ</Link>
+              <Link href="/danh-muc/phim-bo" className="hover:text-cyan-400" suppressHydrationWarning>Phim Bộ</Link>
+            </nav>
+            {/* Group 2: dropdowns */}
+            <div className="flex items-center gap-5 text-white text-sm">
+              {menuItems.map((menu) => (
+                <div key={menu.title} className="relative group">
+                  <button className="flex items-center gap-1 hover:text-cyan-400">
+                    <span>{menu.title}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div className="absolute top-full left-0 mt-2 w-96 bg-slate-900/95 backdrop-blur rounded-xl shadow-2xl border border-slate-700/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="grid grid-cols-3 gap-1 p-4 max-h-80 overflow-y-auto">
+                      {menu.items.map((item) => (
+                        <Link
+                          key={item.slug}
+                          href={`/danh-muc/${item.slug}`}
+                          suppressHydrationWarning
+                          className="px-2 py-1.5 rounded text-xs text-gray-300 hover:text-cyan-400 hover:bg-white/10 transition-colors text-center truncate"
+                          title={item.name}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </nav>
-
-          {/* Search + Mobile Menu */}
-          <div className="flex items-center gap-6">
-            <form onSubmit={handleSearch} className="hidden lg:block">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm phim..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-72 px-4 py-2 pl-10 bg-black/40 border border-white/20 rounded-md text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400"
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+              ))}
+              {/* FAQ last */}
+              <Link href="/faq" className="hover:text-cyan-400" suppressHydrationWarning>FAQ</Link>
+              {/* Desktop search placed at far right */}
+              <form onSubmit={handleSearch} className="ml-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm phim..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-56 px-3 py-1.5 pl-9 bg-black/40 border border-white/20 rounded-md text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400"
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
+          </div>
 
-            {/* Mobile menu button */}
+          {/* Mobile Menu button (desktop hidden) */}
+          <div className="ml-auto flex items-center gap-3 lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden text-white hover:text-cyan-400 transition-colors"
+              className="text-white hover:text-cyan-400 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -195,7 +200,6 @@ const Header = () => {
                 <Link href="/danh-muc/tv-shows" className="hover:text-cyan-400" suppressHydrationWarning>TV Shows</Link>
                 <Link href="/danh-muc/phim-le" className="hover:text-cyan-400" suppressHydrationWarning>Phim Lẻ</Link>
                 <Link href="/danh-muc/phim-bo" className="hover:text-cyan-400" suppressHydrationWarning>Phim Bộ</Link>
-                <Link href="/danh-muc/phim-dang-chieu" className="hover:text-cyan-400" suppressHydrationWarning>Đang chiếu</Link>
               </nav>
 
               {menuItems.map((menu) => (

@@ -30,7 +30,10 @@ const MovieGrid = ({ movies, loading = false }: MovieGridProps) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4">
       {movies.map((movie, index) => (
-        <div key={movie.id || movie.slug || `movie-${index}`} className="h-full relative">
+        <div
+          key={movie.id || movie.slug || `movie-${index}`}
+          className="h-full relative w-48 mx-auto"
+        >
           <MovieCard movie={movie} />
         </div>
       ))}

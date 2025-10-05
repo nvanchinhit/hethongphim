@@ -17,10 +17,10 @@ function SearchContent() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationType>({
-    current_page: 1,
-    total_page: 1,
-    total_items: 0,
-    items_per_page: 10
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    totalItemsPerPage: 24
   });
 
   useEffect(() => {
@@ -39,16 +39,16 @@ function SearchContent() {
         });
 
         setMovies(response.items);
-        setPagination(response.paginate);
+        setPagination(response.pagination);
         
       } catch (error) {
         console.error('Error searching movies:', error);
         setMovies([]);
         setPagination({
-          current_page: 1,
-          total_page: 1,
-          total_items: 0,
-          items_per_page: 10
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 0,
+          totalItemsPerPage: 24
         });
       } finally {
         setLoading(false);
@@ -80,7 +80,7 @@ function SearchContent() {
           )}
           {!loading && query && (
             <p className="text-gray-400">
-              Tìm thấy {pagination.total_items} kết quả • Trang {pagination.current_page} / {pagination.total_page}
+              Tìm thấy {pagination.totalItems} kết quả • Trang {pagination.currentPage} / {pagination.totalPages}
             </p>
           )}
         </div>
@@ -145,10 +145,10 @@ function SearchContent() {
             <MovieGrid movies={movies} />
             
             {/* Pagination */}
-            {pagination.total_page > 1 && (
+            {pagination.totalPages > 1 && (
               <Pagination
-                currentPage={pagination.current_page}
-                totalPages={pagination.total_page}
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
                 onPageChange={handlePageChange}
               />
             )}

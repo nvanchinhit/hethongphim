@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import type { EpisodeListProps } from '@/types';
 
-const EpisodeList = ({ episodes, currentEpisode, movieSlug }: EpisodeListProps) => {
-  if (!episodes || episodes.length === 0) {
+const EpisodeList = ({ episodes, servers, currentEpisode, movieSlug }: EpisodeListProps) => {
+  // Use servers data if available, otherwise fallback to episodes
+  const episodeData = servers && servers.length > 0 ? servers[0].server_data : episodes;
+  
+  if (!episodeData || episodeData.length === 0) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-400">Chưa có tập phim nào</p>
@@ -15,14 +18,14 @@ const EpisodeList = ({ episodes, currentEpisode, movieSlug }: EpisodeListProps) 
   // Group episodes by chunks of 50 for better display
   const episodeChunks = [];
   const chunkSize = 50;
-  for (let i = 0; i < episodes.length; i += chunkSize) {
-    episodeChunks.push(episodes.slice(i, i + chunkSize));
+  for (let i = 0; i < episodeData.length; i += chunkSize) {
+    episodeChunks.push(episodeData.slice(i, i + chunkSize));
   }
 
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-white mb-4">
-        Danh sách tập ({episodes.length} tập)
+        Danh sách tập ({episodeData.length} tập)
       </h3>
       
       {episodeChunks.map((chunk, chunkIndex) => (
@@ -59,10 +62,10 @@ const EpisodeList = ({ episodes, currentEpisode, movieSlug }: EpisodeListProps) 
         </div>
       ))}
       
-      {episodes.length > 50 && (
+      {episodeData.length > 50 && (
         <div className="text-center pt-4">
           <p className="text-sm text-gray-400">
-            Hiển thị tất cả {episodes.length} tập
+            Hiển thị tất cả {episodeData.length} tập
           </p>
         </div>
       )}

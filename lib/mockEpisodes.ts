@@ -8,8 +8,9 @@ export const generateEpisodesForMovie = (movieSlug: string, totalEpisodes: numbe
     episodes.push({
       name: totalEpisodes === 1 ? 'Full' : `Tập ${i}`,
       slug: totalEpisodes === 1 ? 'full' : `tap-${i}`,
-      embed: `https://demo-embed.com/embed/${movieSlug}/${totalEpisodes === 1 ? 'full' : `tap-${i}`}`,
-      m3u8: `https://demo-stream.com/${movieSlug}/${totalEpisodes === 1 ? 'full' : `tap-${i}`}.m3u8`,
+      filename: totalEpisodes === 1 ? 'full' : `tap-${i}`,
+      link_embed: `https://demo-embed.com/embed/${movieSlug}/${totalEpisodes === 1 ? 'full' : `tap-${i}`}`,
+      link_m3u8: `https://demo-stream.com/${movieSlug}/${totalEpisodes === 1 ? 'full' : `tap-${i}`}.m3u8`,
     });
   }
   

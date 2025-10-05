@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { getOptimizedImageUrl } from '../lib/movieApi';
 import type { Movie } from '../types';
 
 interface HomeHeroProps {
@@ -15,12 +16,7 @@ const HomeHero: React.FC<HomeHeroProps> = ({ movies, children }) => {
 
   const bgImage = useMemo(() => {
     if (!currentMovie) return '';
-    return (
-      currentMovie.poster_url ||
-      currentMovie.poster_url ||
-      currentMovie.posterUrl ||
-      ''
-    );
+    return currentMovie.thumb_url || currentMovie.thumbUrl || '';
   }, [currentMovie]);
 
   if (!currentMovie) return null;
@@ -29,6 +25,7 @@ const HomeHero: React.FC<HomeHeroProps> = ({ movies, children }) => {
  <div
    className="relative h-[80vh] w-full bg-center bg-cover bg-no-repeat -mt-16 md:-mt-16"
   style={{ backgroundImage: bgImage ? `url(${bgImage})` : undefined }}
+  suppressHydrationWarning
 >
   {/* Gradient góc dưới */}
   <div className="absolute inset-0 pointer-events-none">
@@ -41,13 +38,13 @@ const HomeHero: React.FC<HomeHeroProps> = ({ movies, children }) => {
   <div className="relative z-10 h-full flex items-center">
     <div className="px-5 md:px-12 w-full text-white">
       <h1 className="text-5xl font-bold mb-3 drop-shadow-md">{currentMovie.name}</h1>
-      <p className="text-gray-200 italic mb-5 text-lg">{currentMovie.original_name}</p>
+      <p className="text-gray-200 italic mb-5 text-lg">{currentMovie.origin_name || currentMovie.originalName}</p>
 
       {/* Badge */}
       <div className="flex flex-wrap gap-2 mb-5 text-sm">
         <span className="bg-green-600 px-3 py-1 rounded">Trọn bộ</span>
-        {currentMovie.year && (
-          <span className="bg-white/10 px-3 py-1 rounded">{currentMovie.year}</span>
+        {(currentMovie.year || (currentMovie.created?.time ? new Date(currentMovie.created.time).getFullYear() : '')) && (
+          <span className="bg-white/10 px-3 py-1 rounded">{currentMovie.year || (currentMovie.created?.time ? new Date(currentMovie.created.time).getFullYear() : '2024')}</span>
         )}
         {(currentMovie.total_episodes || currentMovie.totalEpisodes) && (
           <span className="bg-white/10 px-3 py-1 rounded">
@@ -91,9 +88,10 @@ const HomeHero: React.FC<HomeHeroProps> = ({ movies, children }) => {
               }`}
             >
               <img
-                src={m.poster_url || m.posterUrl || ''}
+                src={m.thumb_url || m.thumbUrl || ''}
                 alt={m.name}
                 className="h-16 w-28 object-cover"
+                loading="lazy"
               />
             </button>
           ))}

@@ -4,14 +4,11 @@ import HomeHero from '../components/HomeHero';
 import MovieCard from '../components/MovieCard';
 import Link from 'next/link';
 import { 
-  getNewUpdateMovies, 
+  getNewUpdateMovies,
   getMoviesByGenre,
-  getMoviesByCategory,
-  getMoviesByCategoryMultiplePages
+  getOptimizedImageUrl
 } from '../lib/movieApi';
-import { Anton } from 'next/font/google';
-
-const anton = Anton({ subsets: ['latin'], weight: '400' });
+// Removed Google Fonts to avoid network errors; rely on system fonts
 
 export default async function HomePage() {
   let newUpdateResponse: any;
@@ -21,198 +18,222 @@ export default async function HomePage() {
   let romanceMovies: Movie[] = [];
   let comedyMovies: Movie[] = [];
   let tinhCoTrangMovies: Movie[] = [];
+  let thanThoaiMovies: Movie[] = [];
   let phimLeMovies: Movie[] = [];
   let phimBoMovies: Movie[] = [];
   let hoatHinhMovies: Movie[] = [];
 
   try {
+    // Lấy phim mới cập nhật cho featured và top rated
     newUpdateResponse = await getNewUpdateMovies(1);
-    featuredMovies = newUpdateResponse.items.slice(0, 4);
+    const allMovies = newUpdateResponse.items || [];
     
-    // Get top rated movies separately
+    // Lấy featured movies (4 phim đầu tiên)
+    featuredMovies = allMovies.slice(0, 4);
+    
+    // Lấy 7 phim mới nhất làm Top
+    topRatedMovies = allMovies.slice(0, 7);
+    if (!topRatedMovies || topRatedMovies.length === 0) {
+      try {
+        const topFallback = await getNewUpdateMovies(1);
+        topRatedMovies = (topFallback.items || []).slice(0, 7);
+      } catch {}
+    }
+    
+    // Gọi API riêng cho Phim hành động và Phim tình cảm
     try {
-      const topRatedResponse = await getMoviesByCategoryMultiplePages('phim-hay', 10);
-      topRatedMovies = topRatedResponse;
-      console.log('Top rated movies:', topRatedMovies.length, topRatedMovies.map(m => m.name));
+      const actionResponse = await getMoviesByGenre('hanh-dong', 1);
+      actionMovies = actionResponse.items.slice(0, 7);
+      // console.log('Action movies loaded:', actionMovies.length);
     } catch (error) {
-      console.warn('Top rated API failed, using fallback:', error);
-      topRatedMovies = newUpdateResponse.items.slice(0, 10);
+      console.warn('Failed to load action movies:', error);
+      // Fallback: lọc từ allMovies
+      actionMovies = allMovies.filter((movie: any) => 
+        movie.category?.some((cat: any) => 
+          cat.slug === 'hanh-dong' || cat.name?.toLowerCase().includes('hành động')
+        )
+      ).slice(0, 7);
     }
     
-    // Ensure we have at least some movies for ranking
-    if (topRatedMovies.length === 0) {
-      topRatedMovies = newUpdateResponse.items.slice(0, 10);
-      console.log('Using fallback for top rated movies:', topRatedMovies.length);
-    }
-
-    // Thử API riêng lẻ cho từng danh mục - fetch 2 trang để có 20 phim
     try {
-      actionMovies = await getMoviesByCategoryMultiplePages('hanh-dong', 20);
-      console.log('Action movies from API:', actionMovies.length, actionMovies.map(m => m.name));
+      const romanceResponse = await getMoviesByGenre('tinh-cam', 1);
+      romanceMovies = romanceResponse.items.slice(0, 7);
+      // console.log('Romance movies loaded:', romanceMovies.length);
     } catch (error) {
-      console.warn('Action API failed:', error);
+      console.warn('Failed to load romance movies:', error);
+      // Fallback: lọc từ allMovies
+      romanceMovies = allMovies.filter((movie: any) => 
+        movie.category?.some((cat: any) => 
+          cat.slug === 'tinh-cam' || cat.name?.toLowerCase().includes('tình cảm')
+        )
+      ).slice(0, 7);
     }
-
+    
+    // Lọc phim khác từ dữ liệu đã có
+    comedyMovies = allMovies.filter((movie: any) => 
+      movie.category?.some((cat: any) => 
+        cat.slug === 'hai-huoc' || cat.name?.toLowerCase().includes('hài hước')
+      )
+    ).slice(0, 7);
+    
+    // Cổ trang: ưu tiên API; fallback lọc
     try {
-      romanceMovies = await getMoviesByCategoryMultiplePages('tinh-cam', 20);
-      console.log('Romance movies from API:', romanceMovies.length, romanceMovies.map(m => m.name));
-    } catch (error) {
-      console.warn('Romance API failed:', error);
+      const coTrangRes = await getMoviesByGenre('co-trang', 1);
+      tinhCoTrangMovies = coTrangRes.items.slice(0, 7);
+    } catch {
+      tinhCoTrangMovies = allMovies.filter((movie: any) => 
+        movie.category?.some((cat: any) => 
+          cat.slug === 'co-trang' || cat.name?.toLowerCase().includes('cổ trang')
+        )
+      ).slice(0, 7);
     }
 
+    // Thần thoại: ưu tiên API; fallback lọc
     try {
-      const comedyRes = await getMoviesByGenre('hai-huoc', 1);
-      comedyMovies = (comedyRes.items || []).slice(0, 7);
-      console.log('Comedy movies from API:', comedyMovies.length, comedyMovies.map(m => m.name));
-    } catch (error) {
-      console.warn('Comedy API failed:', error);
+      const thanThoaiRes = await getMoviesByGenre('than-thoai', 1);
+      thanThoaiMovies = thanThoaiRes.items.slice(0, 7);
+    } catch {
+      thanThoaiMovies = allMovies.filter((movie: any) => 
+        movie.category?.some((cat: any) => 
+          cat.slug === 'than-thoai' || cat.name?.toLowerCase().includes('thần thoại')
+        )
+      ).slice(0, 7);
     }
 
-    try {
-      const tinhCoTrangRes = await getMoviesByGenre('co-trang', 1);
-      tinhCoTrangMovies = (tinhCoTrangRes.items || []).slice(0, 7);
-      console.log('Tinh co trang movies from API:', tinhCoTrangMovies.length, tinhCoTrangMovies.map(m => m.name));
-    } catch (error) {
-      console.warn('Tinh co trang API failed:', error);
-    }
-
-    try {
-      const hoatHinhRes = await getMoviesByGenre('hoat-hinh', 1);
-      hoatHinhMovies = (hoatHinhRes.items || []).slice(0, 7);
-      console.log('Hoat hinh movies from API:', hoatHinhMovies.length, hoatHinhMovies.map(m => m.name));
-    } catch (error) {
-      console.warn('Hoat hinh API failed:', error);
-    }
-
-    // Get phim le and phim bo from new updates - sử dụng cả total_episodes và totalEpisodes
-    const allNewMovies = newUpdateResponse.items || [];
+    // Thần thoại
+    thanThoaiMovies = allMovies.filter((movie: any) => 
+      movie.category?.some((cat: any) => 
+        cat.slug === 'than-thoai' || cat.name?.toLowerCase().includes('thần thoại')
+      )
+    ).slice(0, 7);
     
-    // Debug: kiểm tra dữ liệu episodes
-    console.log('Sample movies episodes:', allNewMovies.slice(0, 3).map((m: any) => ({
-      name: m.name,
-      total_episodes: m.total_episodes,
-      totalEpisodes: m.totalEpisodes
-    })));
+    // Bỏ phim hoạt hình
+    hoatHinhMovies = [];
     
-    phimLeMovies = allNewMovies.filter((movie: any) => {
-      const episodes = movie.total_episodes || movie.totalEpisodes || 0;
-      return episodes === 1;
-    }).slice(0, 7);
-    phimBoMovies = allNewMovies.filter((movie: any) => {
-      const episodes = movie.total_episodes || movie.totalEpisodes || 0;
-      return episodes > 1;
-    }).slice(0, 7);
+    // Lọc phim theo loại từ danh sách chung
+    phimLeMovies = allMovies.filter((movie: any) => 
+      movie.type === 'single' || movie.total_episodes === 1
+    ).slice(0, 7);
     
-    console.log('Filtered results:', {
-      phimLe: phimLeMovies.length,
-      phimBo: phimBoMovies.length,
-      totalMovies: allNewMovies.length
-    });
-
-    // Chỉ dùng fallback khi API thật sự không có dữ liệu
-    const fallback = newUpdateResponse.items || [];
-    const fallbackLength = fallback.length;
+    phimBoMovies = allMovies.filter((movie: any) => 
+      movie.type === 'series' || (movie.total_episodes && movie.total_episodes > 1)
+    ).slice(0, 7);
     
-    // Chỉ dùng fallback khi API không trả về dữ liệu (length === 0)
-    if (actionMovies.length === 0) {
-      actionMovies = fallback.slice(0, Math.min(20, fallbackLength));
-      console.log('Using fallback for action movies');
-    } else {
-      console.log('Action movies from API:', actionMovies.length, 'movies');
-    }
-    
-    if (romanceMovies.length === 0) {
-      romanceMovies = fallback.slice(20, Math.min(40, fallbackLength));
-      console.log('Using fallback for romance movies');
-    } else {
-      console.log('Romance movies from API:', romanceMovies.length, 'movies');
-    }
-    
-    if (comedyMovies.length === 0) {
-      comedyMovies = fallback.slice(14, Math.min(21, fallbackLength));
-      console.log('Using fallback for comedy movies');
-    } else {
-      console.log('Comedy movies from API:', comedyMovies.length, 'movies');
-    }
-    
-    if (tinhCoTrangMovies.length === 0) {
-      tinhCoTrangMovies = fallback.slice(21, Math.min(28, fallbackLength));
-      console.log('Using fallback for tinh co trang movies');
-    } else {
-      console.log('Tinh co trang movies from API:', tinhCoTrangMovies.length, 'movies');
-    }
-    
-    if (hoatHinhMovies.length === 0) {
-      hoatHinhMovies = fallback.slice(28, Math.min(35, fallbackLength));
-      console.log('Using fallback for hoat hinh movies');
-    } else {
-      console.log('Hoat hinh movies from API:', hoatHinhMovies.length, 'movies');
-    }
-    
-    // Đảm bảo phim lẻ và phim bộ luôn có dữ liệu - sử dụng các slice khác nhau
-    if (phimLeMovies.length === 0) {
-      phimLeMovies = fallback.slice(35, Math.min(42, fallbackLength));
-      console.log('Using fallback for phim le:', phimLeMovies.length);
-    }
-    if (phimBoMovies.length === 0) {
-      phimBoMovies = fallback.slice(42, Math.min(49, fallbackLength));
-      console.log('Using fallback for phim bo:', phimBoMovies.length);
-    }
-    
-    // Nếu vẫn trùng nhau, tạo dữ liệu khác biệt
-    if (phimLeMovies.length > 0 && phimBoMovies.length > 0) {
-      const phimLeIds = new Set(phimLeMovies.map(m => m.id || m.slug));
-      const phimBoIds = new Set(phimBoMovies.map(m => m.id || m.slug));
-      
-      // Kiểm tra xem có trùng không
-      const hasOverlap = Array.from(phimLeIds).some(id => phimBoIds.has(id));
-      if (hasOverlap) {
-        console.log('Detected overlap between phim le and phim bo, fixing...');
-        // Sử dụng các slice khác nhau
-        phimLeMovies = fallback.slice(35, Math.min(42, fallbackLength));
-        phimBoMovies = fallback.slice(42, Math.min(49, fallbackLength));
-      }
-    }
-    
-    // Debug log để kiểm tra kết quả cuối cùng
-    console.log('=== FINAL RESULTS ===');
-    console.log('Movie counts by category:', {
+    console.log('Final results:', {
       action: actionMovies.length,
       romance: romanceMovies.length,
       comedy: comedyMovies.length,
       tinhCoTrang: tinhCoTrangMovies.length,
-      hoatHinh: hoatHinhMovies.length,
       phimLe: phimLeMovies.length,
-      phimBo: phimBoMovies.length,
-      totalFallback: fallbackLength
+      phimBo: phimBoMovies.length
     });
     
-    // Debug: kiểm tra tên phim trong mỗi danh mục
-    console.log('Sample movies by category:');
-    if (actionMovies.length > 0) console.log('Action:', actionMovies.slice(0, 2).map(m => m.name));
-    if (romanceMovies.length > 0) console.log('Romance:', romanceMovies.slice(0, 2).map(m => m.name));
-    if (comedyMovies.length > 0) console.log('Comedy:', comedyMovies.slice(0, 2).map(m => m.name));
-    if (tinhCoTrangMovies.length > 0) console.log('Tinh co trang:', tinhCoTrangMovies.slice(0, 2).map(m => m.name));
-    if (hoatHinhMovies.length > 0) console.log('Hoat hinh:', hoatHinhMovies.slice(0, 2).map(m => m.name));
-    if (phimLeMovies.length > 0) console.log('Phim le:', phimLeMovies.slice(0, 2).map(m => m.name));
-    if (phimBoMovies.length > 0) console.log('Phim bo:', phimBoMovies.slice(0, 2).map(m => m.name));
+    // Fallback: nếu không đủ phim theo thể loại, lấy từ danh sách chung
+    if (actionMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !actionMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'phieu-luu' || cat.name?.toLowerCase().includes('phiêu lưu') ||
+          cat.slug === 'chien-tranh' || cat.name?.toLowerCase().includes('chiến tranh') ||
+          cat.slug === 'vo-thuat' || cat.name?.toLowerCase().includes('võ thuật')
+        ))
+      ).slice(0, 7 - actionMovies.length);
+      actionMovies = [...actionMovies, ...additionalMovies];
+    }
     
-    // Debug: kiểm tra xem có phim nào trùng nhau không
-    const allMovieIds = [
-      ...actionMovies.map(m => m.id || m.slug),
-      ...romanceMovies.map(m => m.id || m.slug),
-      ...comedyMovies.map(m => m.id || m.slug),
-      ...tinhCoTrangMovies.map(m => m.id || m.slug),
-      ...hoatHinhMovies.map(m => m.id || m.slug),
-      ...phimLeMovies.map(m => m.id || m.slug),
-      ...phimBoMovies.map(m => m.id || m.slug)
-    ];
-    const uniqueIds = new Set(allMovieIds);
-    console.log('Total movies displayed:', allMovieIds.length, 'Unique movies:', uniqueIds.size);
+    if (romanceMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !romanceMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'lang-man' || cat.name?.toLowerCase().includes('lãng mạn') ||
+          cat.slug === 'tam-ly' || cat.name?.toLowerCase().includes('tâm lý')
+        ))
+      ).slice(0, 7 - romanceMovies.length);
+      romanceMovies = [...romanceMovies, ...additionalMovies];
+    }
+    
+    if (comedyMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !comedyMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'gia-dinh' || cat.name?.toLowerCase().includes('gia đình') ||
+          cat.slug === 'hoc-duong' || cat.name?.toLowerCase().includes('học đường')
+        ))
+      ).slice(0, 7 - comedyMovies.length);
+      comedyMovies = [...comedyMovies, ...additionalMovies];
+    }
+    
+    if (tinhCoTrangMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !tinhCoTrangMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'lich-su' || cat.name?.toLowerCase().includes('lịch sử') ||
+          cat.slug === 'than-thoai' || cat.name?.toLowerCase().includes('thần thoại')
+        ))
+      ).slice(0, 7 - tinhCoTrangMovies.length);
+      tinhCoTrangMovies = [...tinhCoTrangMovies, ...additionalMovies];
+    }
+
+    if (thanThoaiMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !thanThoaiMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'gia-tuong' || cat.name?.toLowerCase().includes('giả tưởng') ||
+          cat.slug === 'co-trang' || cat.name?.toLowerCase().includes('cổ trang')
+        ))
+      ).slice(0, 7 - thanThoaiMovies.length);
+      thanThoaiMovies = [...thanThoaiMovies, ...additionalMovies];
+    }
+
+    if (thanThoaiMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !thanThoaiMovies.some(existing => existing.id === movie.id) &&
+        (movie.category?.some((cat: any) => 
+          cat.slug === 'gia-tuong' || cat.name?.toLowerCase().includes('giả tưởng') ||
+          cat.slug === 'co-trang' || cat.name?.toLowerCase().includes('cổ trang')
+        ))
+      ).slice(0, 7 - thanThoaiMovies.length);
+      thanThoaiMovies = [...thanThoaiMovies, ...additionalMovies];
+    }
+    
+    if (phimLeMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !phimLeMovies.some(existing => existing.id === movie.id) &&
+        (movie.type === 'single' || movie.total_episodes === 1)
+      ).slice(0, 7 - phimLeMovies.length);
+      phimLeMovies = [...phimLeMovies, ...additionalMovies];
+    }
+    
+    if (phimBoMovies.length < 7) {
+      const additionalMovies = allMovies.filter((movie: any) => 
+        !phimBoMovies.some(existing => existing.id === movie.id) &&
+        (movie.type === 'series' || (movie.total_episodes && movie.total_episodes > 1))
+      ).slice(0, 7 - phimBoMovies.length);
+      phimBoMovies = [...phimBoMovies, ...additionalMovies];
+    }
 
   } catch (error) {
     console.error('Error loading homepage data:', error);
-    newUpdateResponse = { items: [], paginate: { current_page: 1, total_page: 1, total_items: 0, items_per_page: 10 } };
+    newUpdateResponse = { items: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0, totalItemsPerPage: 24 } };
+    
+    // Fallback data để đảm bảo trang chủ luôn có nội dung
+    if (featuredMovies.length === 0) {
+      featuredMovies = [
+        {
+          id: 'fallback-1',
+          name: 'Phim mẫu 1',
+          slug: 'phim-mau-1',
+          thumb_url: 'https://via.placeholder.com/300x450/1e293b/ffffff?text=Phim+Mẫu+1',
+          year: 2024,
+          quality: 'HD',
+          total_episodes: 1,
+          current_episode: 'Trọn bộ',
+          description: 'Đây là phim mẫu để hiển thị khi không có dữ liệu thực.',
+          category: [{ name: 'Hành động', slug: 'hanh-dong' }],
+          country: [{ name: 'Việt Nam', slug: 'viet-nam' }]
+        } as any
+      ];
+    }
   }
 
   const newUpdateMovies = (newUpdateResponse.items as any[]).slice(0, 7);
@@ -254,8 +275,8 @@ export default async function HomePage() {
                       </svg>
                     </div>
                     <div
-                      className={`w-full text-8xl md:text-[9.5rem] leading-none text-center select-none bg-gradient-to-b from-white/90 to-white/20 text-transparent bg-clip-text brightness-200 ${anton.className}`}
-                      style={{ WebkitTextStroke: '2px rgba(255,255,255,0.25)' }}
+                      className="w-full text-8xl md:text-[10rem] leading-none text-center select-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 font-extrabold tracking-tight drop-shadow-[0_3px_8px_rgba(0,0,0,0.6)]"
+                      style={{ WebkitTextStroke: '2.5px rgba(255,255,255,0.28)', textShadow: '0 2px 6px rgba(0,0,0,0.65)' }}
                     >
                       {idx + 1}
                     </div>
@@ -315,35 +336,21 @@ export default async function HomePage() {
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mt-2">
           {[
-            'Hành Động',
-            'Hài',
-            'Chính Kịch',
-            'Lịch Sử',
-            'Bí Ẩn',
-            'Gây Cấn',
-            'Tình Cảm',
-            'Phim 18+',
-            'Phiêu Lưu',
-            'Hình Sự',
-            'Gia Đình',
-            'Kinh Dị',
-            'Lãng Mạn',
-            'Chiến Tranh',
-            'Cổ Trang',
-            'Hoạt Hình',
-            'Tài Liệu',
-            'Giả Tưởng',
-            'Nhạc',
-            'Khoa Học Viễn Tưởng',
-            'Tâm Lý',
-            'Miền Tây',
+            { name: 'Hành Động', slug: 'hanh-dong' },
+            { name: 'Hài', slug: 'hai-huoc' },
+            { name: 'Chính Kịch', slug: 'chinh-kich' },
+            { name: 'Tình Cảm', slug: 'tinh-cam' },
+            { name: 'Cổ Trang', slug: 'co-trang' },
+            { name: 'Thần Thoại', slug: 'than-thoai' },
           ].map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 text-sm rounded-md bg-slate-800 text-gray-300 border border-slate-700 hover:border-cyan-500/50 cursor-default"
+            <Link
+              key={tag.slug}
+              href={`/danh-muc/${tag.slug}`}
+              className="px-3 py-1 text-sm rounded-md bg-slate-800 text-gray-300 border border-slate-700 hover:border-cyan-500/50 hover:text-white transition-colors"
+              suppressHydrationWarning
             >
-              {tag}
-            </span>
+              {tag.name}
+            </Link>
           ))}
         </div>
       </section>
@@ -390,16 +397,20 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="relative">
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 pr-4 snap-x snap-mandatory">
-            {topRatedMovies.slice(0, 7).map((movie: any, idx: number) => (
-              <div
-                key={(movie && (movie.id || movie.slug)) || `top-${idx}`}
-                className="flex-shrink-0 w-48 snap-start h-full"
-              >
-                <MovieCard movie={movie} />
-              </div>
-            ))}
-          </div>
+          {topRatedMovies && topRatedMovies.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 pr-4 snap-x snap-mandatory">
+              {topRatedMovies.slice(0, 7).map((movie: any, idx: number) => (
+                <div
+                  key={(movie && (movie.id || movie.slug)) || `top-${idx}`}
+                  className="flex-shrink-0 w-48 snap-start h-full"
+                >
+                  <MovieCard movie={movie} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-sm py-8">Chưa có dữ liệu top phim.</div>
+          )}
         </div>
       </section>
 
@@ -517,6 +528,34 @@ export default async function HomePage() {
             </div>
           )}
 
+          {/* Thần Thoại Movies - chỉ hiển thị nếu có phim */}
+          {thanThoaiMovies.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-white">Phim thần thoại</h3>
+                <Link
+                  href="/danh-muc/than-thoai"
+                  className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
+                  suppressHydrationWarning
+                >
+                  <span>Xem thêm</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+              <div className="relative">
+                <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-4">
+                  {thanThoaiMovies.slice(0, 7).map((movie: any, idx: number) => (
+                    <div key={movie.id || movie.slug || `than-thoai-${idx}`} className="flex-shrink-0 w-48 h-full">
+                      <MovieCard movie={movie} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Phim Lẻ Movies - chỉ hiển thị nếu có phim */}
           {phimLeMovies.length > 0 && (
             <div>
@@ -573,13 +612,13 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* Hoạt Hình Movies - chỉ hiển thị nếu có phim */}
-          {hoatHinhMovies.length > 0 && (
+          {/* Thần Thoại Movies - chỉ hiển thị nếu có phim */}
+          {thanThoaiMovies.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-white">Phim hoạt hình</h3>
+                <h3 className="text-xl font-semibold text-white">Phim thần thoại</h3>
                 <Link
-                  href="/danh-muc/hoat-hinh"
+                  href="/danh-muc/than-thoai"
                   className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 transition-colors"
                   suppressHydrationWarning
                 >
@@ -591,8 +630,8 @@ export default async function HomePage() {
               </div>
               <div className="relative">
                 <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-4">
-                  {hoatHinhMovies.slice(0, 7).map((movie: any, idx: number) => (
-                    <div key={movie.id || movie.slug || `hoat-hinh-${idx}`} className="flex-shrink-0 w-48 h-full">
+                  {thanThoaiMovies.slice(0, 7).map((movie: any, idx: number) => (
+                    <div key={movie.id || movie.slug || `than-thoai-${idx}`} className="flex-shrink-0 w-48 h-full">
                       <MovieCard movie={movie} />
                     </div>
                   ))}
@@ -600,6 +639,7 @@ export default async function HomePage() {
               </div>
             </div>
           )}
+
         </div>
       </section>
     </div>

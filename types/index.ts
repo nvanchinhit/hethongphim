@@ -1,25 +1,51 @@
-// Movie related types
+// Movie related types - updated for phimapi.com structure
 export interface Movie {
-  id?: string;
+  _id: string;
   name: string;
   slug: string;
-  original_name: string;
+  origin_name: string;
   thumb_url: string;
   poster_url: string;
-  description: string;
-  total_episodes: number;
-  current_episode: string;
+  content?: string;
+  type: 'single' | 'series' | 'hoathinh';
+  status?: 'completed' | 'ongoing';
   time: string;
+  episode_current: string;
+  episode_total?: string;
   quality: string;
-  language: string;
-  director?: string | string[];
-  casts?: string | string[];
-  created?: string;
-  modified?: string;
-  category?: CategoryGroup;
+  lang: string;
+  year: number;
+  view?: number;
+  actor?: string[];
+  director?: string[];
+  category: Category[];
+  country: Country[];
+  sub_docquyen?: boolean;
+  chieurap?: boolean;
+  trailer_url?: string;
+  notify?: string;
+  showtimes?: string;
+  is_copyright?: boolean;
+  created?: {
+    time: string;
+  };
+  modified?: {
+    time: string;
+  };
+  tmdb?: {
+    type: string | null;
+    id: string | null;
+    season: number | null;
+    vote_average: number;
+    vote_count: number;
+  };
+  imdb?: {
+    id: string | null;
+  };
   // Episodes for detail pages
   episodes?: EpisodeServer[];
   // For compatibility with existing code
+  id?: string;
   originalName?: string;
   thumbUrl?: string;
   posterUrl?: string;
@@ -27,9 +53,11 @@ export interface Movie {
   currentEpisode?: string;
   episodeTime?: string;
   cast?: string[];
-  country?: Country[];
-  year?: number;
-  view?: number;
+  description?: string;
+  total_episodes?: number;
+  current_episode?: string;
+  language?: string;
+  casts?: string | string[];
   isCopyright?: boolean;
   isNewUpdate?: boolean;
   createdAt?: string;
@@ -49,8 +77,7 @@ export interface CategoryGroup {
 export interface Category {
   id: string;
   name: string;
-  slug?: string;
-  title?: string;
+  slug: string;
 }
 
 export interface Country {
@@ -62,44 +89,72 @@ export interface Country {
 export interface Episode {
   name: string;
   slug: string;
-  embed: string;
-  m3u8: string;
+  filename: string;
+  link_embed: string;
+  link_m3u8: string;
 }
 
 export interface EpisodeServer {
   server_name: string;
-  items: Episode[];
+  server_data: Episode[];
 }
 
-// API Response types
+// API Response types - updated for phimapi.com structure
 export interface ApiResponse<T> {
-  status: string;
-  message?: string;
+  status: boolean | string;
+  msg?: string;
   data?: T;
   movie?: T;
   items?: T;
-  cat?: Category;
-  paginate?: Pagination;
+  pagination?: Pagination;
+  seoOnPage?: {
+    og_type?: string;
+    titleHead?: string;
+    descriptionHead?: string;
+    og_image?: string[];
+    og_url?: string;
+  };
+  breadCrumb?: Array<{
+    name: string;
+    slug?: string;
+    isCurrent: boolean;
+    position: number;
+  }>;
+  titlePage?: string;
+  params?: {
+    type_slug?: string;
+    filterCategory?: string[];
+    filterCountry?: string[];
+    filterYear?: string | string[];
+    filterType?: string;
+    sortField?: string;
+    sortType?: string;
+    pagination?: Pagination;
+  };
+  type_list?: string;
+  APP_DOMAIN_FRONTEND?: string;
+  APP_DOMAIN_CDN_IMAGE?: string;
 }
 
 export interface PaginatedResponse<T> {
   items: T[];
-  paginate: Pagination;
+  pagination: Pagination;
 }
 
 export interface Pagination {
-  current_page: number;
-  total_page: number;
-  total_items: number;
-  items_per_page: number;
+  totalItems: number;
+  totalItemsPerPage: number;
+  currentPage: number;
+  totalPages: number;
+  updateToday?: number;
   // For compatibility
-  totalItems?: number;
-  totalItemsPerPage?: number;
-  currentPage?: number;
-  totalPages?: number;
+  current_page?: number;
+  total_page?: number;
+  total_items?: number;
+  items_per_page?: number;
 }
 
-// Search types
+// Search types - updated for phimapi.com
 export interface SearchParams {
   keyword?: string;
   category?: string;
@@ -107,6 +162,9 @@ export interface SearchParams {
   year?: number;
   page?: number;
   limit?: number;
+  sort_field?: 'modified.time' | '_id' | 'year';
+  sort_type?: 'desc' | 'asc';
+  sort_lang?: 'vietsub' | 'thuyet-minh' | 'long-tieng';
 }
 
 // Component props types
@@ -143,27 +201,10 @@ export interface VideoPlayerProps {
   title?: string;
 }
 
-// Movie detail response
+// Movie detail response - updated for phimapi.com
 export interface MovieDetailResponse {
-  status: string;
-  movie: {
-    id: string;
-    name: string;
-    slug: string;
-    original_name: string;
-    thumb_url: string;
-    poster_url: string;
-    created: string;
-    modified: string;
-    description: string;
-    total_episodes: number;
-    current_episode: string;
-    time: string;
-    quality: string;
-    language: string;
-    director: string;
-    casts: string;
-    category: CategoryGroup;
-    episodes: EpisodeServer[];
-  };
+  status: boolean;
+  msg: string;
+  movie: Movie;
+  episodes: EpisodeServer[];
 }

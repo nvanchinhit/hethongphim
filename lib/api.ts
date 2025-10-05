@@ -62,18 +62,28 @@ class ApiClient {
     const { params, ...fetchOptions } = options;
     const url = this.buildURL(endpoint, params);
     
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'WebPhim/1.0',
-        ...fetchOptions.headers,
-      },
-      ...fetchOptions,
-    });
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'WebPhim/1.0',
+          ...fetchOptions.headers,
+        },
+        mode: 'cors',
+        cache: 'default',
+        ...fetchOptions,
+      });
 
-    return this.handleResponse<T>(response);
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      console.error('Fetch error:', error);
+      throw new ApiError(
+        `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        0,
+        error
+      );
+    }
   }
 
   async post<T>(endpoint: string, data?: any, options: FetchOptions = {}): Promise<T> {

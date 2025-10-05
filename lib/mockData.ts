@@ -95,11 +95,11 @@ export const getMovies = async (params?: {
     if (params?.search) queryParams.q = params.search;
 
     // Map category to API endpoint
-    let endpoint: string = API_ENDPOINTS.MOVIES.LIST;
+    let endpoint: string = API_ENDPOINTS.MOVIES.NEW_UPDATES;
     if (params?.category) {
       const mappedCategory = CATEGORY_MAPPINGS[params.category as keyof typeof CATEGORY_MAPPINGS];
       if (mappedCategory) {
-        endpoint = API_ENDPOINTS.MOVIES.BY_CATEGORY(mappedCategory);
+        endpoint = API_ENDPOINTS.MOVIES.BY_GENRE(mappedCategory);
       }
     }
 

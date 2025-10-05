@@ -3,17 +3,18 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getOptimizedImageUrl } from '../lib/movieApi';
 import type { MovieCardProps } from '../types';
 
 const MovieCardHero = ({ movie, showEpisode = true }: MovieCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Prefer thumb for grid/demo, fallback to poster
-  const posterUrl = movie.thumb_url || movie.thumbUrl || movie.poster_url || movie.posterUrl || '';
-  const originalName = movie.original_name || movie.originalName;
+  // Chỉ dùng thumb_url thôi
+  const thumbUrl = movie.thumb_url || movie.thumbUrl || '';
+  const originalName = movie.origin_name || movie.originalName;
   const totalEpisodes = movie.total_episodes || movie.totalEpisodes || 1;
   const currentEpisode = movie.current_episode || movie.currentEpisode || '1';
-  const year = movie.year || (movie.created ? new Date(movie.created).getFullYear() : new Date().getFullYear());
+  const year = movie.year || (movie.created?.time ? new Date(movie.created.time).getFullYear() : new Date().getFullYear());
 
   return (
     <div className="movie-card-hero bg-slate-800/80 backdrop-blur-sm rounded-xl overflow-hidden group relative shadow-lg hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 border border-slate-700/50 hover:border-cyan-500/30 h-full w-full hover:scale-105 hover:z-20">
@@ -26,16 +27,12 @@ const MovieCardHero = ({ movie, showEpisode = true }: MovieCardProps) => {
               </svg>
             </div>
           )}
-          {posterUrl ? (
-            <Image
-              src={posterUrl}
+          {thumbUrl ? (
+            <img
+              src={thumbUrl}
               alt={movie.name}
-              fill
-              className={`object-cover transition-all duration-500 group-hover:scale-110 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => setImageLoaded(true)}
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+              className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+              loading="lazy"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-slate-500">

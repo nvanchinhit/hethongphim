@@ -6,7 +6,7 @@ import Link from 'next/link';
 import VideoPlayer from '@/components/VideoPlayer';
 import EpisodeList from '@/components/EpisodeList';
 import MovieGrid from '@/components/MovieGrid';
-import { getMovieDetail, getNewUpdateMovies } from '@/lib/movieApi';
+import { getMovieDetail, getNewUpdateMovies, getOptimizedImageUrl } from '@/lib/movieApi';
 import type { Movie, Episode, EpisodeServer } from '@/types';
 
 export default function WatchPage() {
@@ -39,11 +39,11 @@ export default function WatchPage() {
             
             // Get all episodes from first server
             const firstServer = movieData.episodes[0];
-            if (firstServer && firstServer.items) {
-              setEpisodes(firstServer.items);
+            if (firstServer && firstServer.server_data) {
+              setEpisodes(firstServer.server_data);
               
               // Find current episode
-              const episode = firstServer.items.find(ep => ep.slug === episodeSlug) || firstServer.items[0];
+              const episode = firstServer.server_data.find((ep: any) => ep.slug === episodeSlug) || firstServer.server_data[0];
               setCurrentEpisode(episode);
             }
           }
@@ -67,12 +67,12 @@ export default function WatchPage() {
 
   const handleServerChange = (serverIndex: number) => {
     setCurrentServer(serverIndex);
-    if (servers[serverIndex] && servers[serverIndex].items) {
-      const newEpisodes = servers[serverIndex].items;
+    if (servers[serverIndex] && servers[serverIndex].server_data) {
+      const newEpisodes = servers[serverIndex].server_data;
       setEpisodes(newEpisodes);
       
       // Find current episode in new server
-      const episode = newEpisodes.find(ep => ep.slug === episodeSlug) || newEpisodes[0];
+      const episode = newEpisodes.find((ep: any) => ep.slug === episodeSlug) || newEpisodes[0];
       setCurrentEpisode(episode);
     }
   };
@@ -137,8 +137,8 @@ export default function WatchPage() {
         {/* Video Player */}
         <div className="mb-8">
           <VideoPlayer
-            src={currentEpisode.embed}
-            poster={movie.thumb_url || movie.thumbUrl}
+            src={currentEpisode.link_embed || ''}
+            poster={movie.thumb_url || movie.thumbUrl || ''}
             title={`${movie.name} - ${currentEpisode.name}`}
           />
         </div>
@@ -150,7 +150,7 @@ export default function WatchPage() {
               {movie.name}
             </h1>
             <h2 className="text-lg text-gray-400 mb-4">
-              {movie.original_name || movie.originalName} - {currentEpisode.name}
+              {movie.origin_name || movie.originalName} - {currentEpisode.name}
             </h2>
             
             <div className="flex flex-wrap gap-4 mb-6">
@@ -161,7 +161,7 @@ export default function WatchPage() {
                 {movie.language}
               </span>
               <span className="bg-green-600 text-white px-3 py-1 rounded text-sm">
-                {movie.year || (movie.created ? new Date(movie.created).getFullYear() : '')}
+                {movie.year || (movie.created?.time ? new Date(movie.created.time).getFullYear() : '')}
               </span>
               <span className="bg-purple-600 text-white px-3 py-1 rounded text-sm">
                 {movie.time}
@@ -192,7 +192,7 @@ export default function WatchPage() {
 
             <div className="bg-slate-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold text-white mb-4">Nội dung phim</h3>
-              <div className="text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: movie.description }} />
+              <div className="text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: movie.description || movie.content || '' }} />
             </div>
           </div>
 
