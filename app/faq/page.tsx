@@ -66,7 +66,7 @@ export default function FaqPage() {
                     <p><span className="text-cyan-400">Ngân hàng:</span> Á Châu Bank</p>
                     <p><span className="text-cyan-400">Số tài khoản:</span> 200546</p>
                     <p><span className="text-cyan-400">Chủ TK:</span> NGUYEN VAN CHINH</p>
-                    <p className="text-xs text-gray-400">Nội dung chuyển khoản: "Ung ho WebPhim"</p>
+                    <p className="text-xs text-gray-400">Nội dung chuyển khoản: &quot;Ung ho WebPhim&quot;</p>
                   </div>
                   <div className="flex items-center justify-center">
                     <img src="https://qr.sepay.vn/img?bank=ACB&acc=200546&template=compact&amount=&des=" alt="QR Ủng hộ" className="w-40 h-40 rounded bg-slate-700 object-contain" />
